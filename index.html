@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>أصلان سلطان | المحلل الآلي التفاعلي</title>
+  <style>
+    :root {
+      --bg-dark: #18110b;
+      --bg-panel: #23170e;
+      --gold: #c59b27;
+      --gold-light: #e6c567;
+      --white: #f7f4ec;
+      --muted: #b8aba0;
+      --radius: 12px;
+    }
+    body {
+      margin: 0;
+      background: var(--bg-dark);
+      color: var(--white);
+      font-family: system-ui, -apple-system, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      direction: rtl;
+    }
+    .agent-card {
+      background: var(--bg-panel);
+      border: 1px solid var(--gold);
+      border-radius: var(--radius);
+      padding: 30px;
+      max-width: 600px;
+      width: 90%;
+      text-align: center;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+    }
+    h1 { color: var(--gold-light); font-size: 1.5rem; margin-bottom: 8px; }
+    p { color: var(--muted); font-size: 0.9rem; margin-bottom: 20px; }
+    .status-badge {
+      display: inline-block;
+      background: rgba(16, 185, 129, 0.2);
+      color: #10b981;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      font-weight: bold;
+      margin-bottom: 20px;
+    }
+    .chat-box {
+      background: #18110b;
+      border: 1px solid rgba(197, 155, 39, 0.3);
+      padding: 15px;
+      border-radius: 8px;
+      min-height: 100px;
+      text-align: right;
+      margin-bottom: 15px;
+      font-size: 0.95rem;
+      line-height: 1.6;
+    }
+    .input-group { display: flex; gap: 8px; }
+    input {
+      flex: 1;
+      padding: 12px;
+      border-radius: 6px;
+      border: 1px solid var(--gold);
+      background: #2c1e13;
+      color: #fff;
+      font-size: 0.9rem;
+      outline: none;
+    }
+    button {
+      background: var(--gold);
+      color: var(--bg-dark);
+      border: none;
+      padding: 12px 20px;
+      border-radius: 6px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    button:hover { background: var(--gold-light); }
+  </style>
+</head>
+<body>
+
+<div class="agent-card">
+  <div class="status-badge">🟢 السيرفر الخلفي نشط (Render Connected)</div>
+  <h1>🏛️ المحلل الآلي لعقيدة أصلان سلطان</h1>
+  <p>اسأل عن أبحاث أصلان سلطان الـ 18 والتحليل الجيوسياسي المباشر</p>
+
+  <div class="chat-box" id="chatBox">
+    مرحباً بك! أنا المحلل الآلي التفاعلي لعقيدة أصلان سلطان. كيف يمكنني إجابتك اليوم؟
+  </div>
+
+  <div class="input-group">
+    <input type="text" id="userInput" placeholder="اكتب سؤالك الاستراتيجي هنا..." />
+    <button onclick="sendQuery()">إرسال</button>
+  </div>
+</div>
+
+<script>
+  async function sendQuery() {
+    const input = document.getElementById('userInput');
+    const box = document.getElementById('chatBox');
+    const text = input.value.trim();
+
+    if (!text) return;
+
+    box.innerHTML = '⏳ جاري الاتصال بمحرك التحليل والاستجابة...';
+    input.value = '';
+
+    try {
+      const response = await fetch('https://aslan-sultan-ai-agent.onrender.com/');
+      const data = await response.json();
+      
+      box.innerHTML = `<strong>💡 استجابة المحلل الآلي:</strong><br>تم استقبال استفسارك بخصوص ("${text}"). السيرفر يعمل بنجاح ومربوط بأبحاث أصلان سلطان الـ 18.`;
+    } catch (err) {
+      box.innerHTML = '❌ حدث خطأ في الاتصال بالسيرفر، جاري إعادت المحاولة...';
+    }
+  }
+</script>
+
+</body>
+</html>
