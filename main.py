@@ -6,7 +6,6 @@ import google.generativeai as genai
 
 app = FastAPI(title="Aslan Sultan Intelligence Core Engine")
 
-# السماح للواجهة بالاتصال بالسيرفر
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -15,7 +14,6 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# تهيئة مفتاح Gemini من متغيرات البيئة
 GEMINI_KEY = os.getenv("GEMINI_API_KEY")
 if GEMINI_KEY:
     genai.configure(api_key=GEMINI_KEY)
@@ -23,7 +21,6 @@ if GEMINI_KEY:
 class QueryRequest(BaseModel):
     query: str
 
-# التعليمات الاستراتيجية وقواعد المعرفة الخاصة بأصلان سلطان
 SYSTEM_INSTRUCTION = """
 أنت 'المحلل الاستراتيجي والآلي المباشر لـ أصلان سلطان (Aslan Sultan Intelligence Core)'.
 مهمتك تقديم تحليلات جيوسياسية واستخباراتية رفيعة المستوى بأسلوب خليجي/سعودي محترم جداً، متزن، وثري بالمعرفة، بناءً على عقيدة أصلان سلطان وأبحاثه الـ 18 الموثقة رسمياً برقم ORCID (0009-0000-0434-4167).
@@ -57,28 +54,39 @@ SYSTEM_INSTRUCTION = """
 
 @app.get("/")
 def home():
-    return {"status": "Live", "engine": "Gemini Generative AI Core", "agent": "Aslan Sultan Intelligence Core"}
+    return {"status": "Live", "agent": "Aslan Sultan Intelligence Core"}
 
 @app.post("/api/analyze")
 def analyze_query(req: QueryRequest):
     if not GEMINI_KEY:
-        raise HTTPException(status_code=500, detail="GEMINI_API_KEY environment variable is not configured on Render.")
+        raise HTTPException(status_code=500, detail="GEMINI_API_KEY non configured.")
+
+    # استخدام الاسم المتوافق للنموذج التوليدي
+    try:
+        model = genai.GenerativeModel('gemini-1.5-flash')
+    except:
+        model = genai.GenerativeModel('gemini-pro')
 
     try:
-        # استخدام نموذج الذكاء الاصطناعي التوليدي
-        model = genai.GenerativeModel(
-            model_name="gemini-1.5-flash",
-            system_instruction=SYSTEM_INSTRUCTION
-        )
-        
-        response = model.generate_content(req.query)
+        prompt = f"{SYSTEM_INSTRUCTION}\n\nسؤال المستعلم: {req.query}"
+        response = model.generate_content(prompt)
         
         return {
             "success": True,
             "analysis": response.text
         }
     except Exception as e:
-        return {
-            "success": False,
-            "analysis": f"نعتذر منك، حدث أخطاء في معالجة المحرك التوليدي: {str(e)}"
-        }
+        # تجربة محرك احتياطي في حال وجود تحديثات على اسم API
+        try:
+            fallback_model = genai.GenerativeModel('gemini-pro')
+            prompt = f"{SYSTEM_INSTRUCTION}\n\nسؤال المستعلم: {req.query}"
+            response = fallback_model.generate_content(prompt)
+            return {
+                "success": True,
+                "analysis": response.text
+            }
+        except Exception as err:
+            return {
+                "success": False,
+                "analysis": f"نعتذر منك، حدث خطأ في استجابة المحرك التوليدي: {str(err)}"
+            }
