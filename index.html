@@ -1,3 +1,220 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Aslan Sultan AI — Strategic Intelligence Core</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --bg-dark: #0d0b08;
+      --panel-dark: #16120d;
+      --border-gold: rgba(212, 175, 55, 0.4);
+      --gold-primary: #d4af37;
+      --gold-bright: #f5d77f;
+      --text-white: #f7f5f0;
+      --text-muted: #a69a8a;
+      --user-bubble: #2a2218;
+      --bot-bubble: #19140e;
+      --font-main: 'Tajawal', 'Cairo', sans-serif;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background-color: var(--bg-dark);
+      color: var(--text-white);
+      font-family: var(--font-main);
+      direction: rtl;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 15px;
+    }
+
+    .gemini-container {
+      width: 100%;
+      max-width: 800px;
+      height: 88vh;
+      background: var(--panel-dark);
+      border: 1px solid var(--border-gold);
+      border-radius: 16px;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 15px 40px rgba(0,0,0,0.9);
+      overflow: hidden;
+    }
+
+    .header {
+      padding: 18px 22px;
+      background: #120e0a;
+      border-bottom: 1px solid var(--border-gold);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .header h1 {
+      font-size: 1.2rem;
+      color: var(--gold-bright);
+      margin-bottom: 4px;
+    }
+
+    .header p {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    .status-pill {
+      background: rgba(212, 175, 55, 0.15);
+      border: 1px solid var(--gold-primary);
+      color: var(--gold-bright);
+      padding: 5px 12px;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+
+    .chat-body {
+      flex: 1;
+      padding: 20px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+      background: #0d0b08;
+    }
+
+    .message {
+      max-width: 88%;
+      padding: 14px 18px;
+      border-radius: 12px;
+      font-size: 0.95rem;
+      line-height: 1.8;
+      word-wrap: break-word;
+    }
+
+    .message.bot {
+      background: var(--bot-bubble);
+      border: 1px solid var(--border-gold);
+      border-right: 4px solid var(--gold-primary);
+      align-self: flex-start;
+      color: var(--text-white);
+    }
+
+    .message.user {
+      background: var(--user-bubble);
+      border: 1px solid rgba(212, 175, 55, 0.3);
+      align-self: flex-end;
+      color: var(--gold-bright);
+    }
+
+    .footer-input-area {
+      padding: 16px 20px;
+      background: #120e0a;
+      border-top: 1px solid var(--border-gold);
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .input-wrapper {
+      display: flex;
+      gap: 10px;
+    }
+
+    .chat-input {
+      flex: 1;
+      padding: 12px 16px;
+      background: #1c1711;
+      border: 1px solid var(--border-gold);
+      border-radius: 8px;
+      color: #fff;
+      font-family: var(--font-main);
+      font-size: 0.95rem;
+      outline: none;
+    }
+
+    .send-btn {
+      background: var(--gold-primary);
+      color: #0d0b08;
+      border: none;
+      padding: 0 22px;
+      border-radius: 8px;
+      font-weight: 700;
+      font-family: var(--font-main);
+      font-size: 0.95rem;
+      cursor: pointer;
+    }
+
+    .send-btn:hover { background: var(--gold-bright); }
+
+    .social-bar {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      padding-top: 5px;
+    }
+
+    .social-link {
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 0.78rem;
+      padding: 6px 12px;
+      background: #1a150f;
+      border: 1px solid rgba(212, 175, 55, 0.2);
+      border-radius: 6px;
+      white-space: nowrap;
+    }
+
+    .social-link:hover {
+      color: var(--gold-bright);
+      border-color: var(--gold-primary);
+    }
+  </style>
+</head>
+<body>
+
+<div class="gemini-container">
+  
+  <div class="header">
+    <div>
+      <h1>🏛️ Aslan Sultan AI Agent Core</h1>
+      <p>المحلل الاستراتيجي المباشر لأبحاث أصلان سلطان الـ 18</p>
+    </div>
+    <div class="status-pill">● Generative AI Live</div>
+  </div>
+
+  <div class="chat-body" id="chatBody">
+    <div class="message bot">
+      مرحباً بك! أنا المحلل الآلي المباشر لعقيدة أصلان سلطان.<br>
+      يمكنك طرح أي سؤال باللغة العربية أو الإنجليزية حول أبحاثنا الـ 18 ودراسات المنطقة الرمادية.
+    </div>
+  </div>
+
+  <div class="footer-input-area">
+    <div class="input-wrapper">
+      <input type="text" id="userInput" class="chat-input" placeholder="اكتب سؤالك الاستراتيجي هنا..." onkeypress="handleKey(event)">
+      <button class="send-btn" onclick="sendMessage()">تحليل</button>
+    </div>
+
+    <div class="social-bar">
+      <a class="social-link" href="https://sites.google.com/view/aslansultanzenodohub/home" target="_blank">🌐 Research Hub</a>
+      <a class="social-link" href="https://www.youtube.com/@authoraslansultan" target="_blank">▶️ YouTube</a>
+      <a class="social-link" href="https://x.com/aslansultan__" target="_blank">𝕏 Twitter / X</a>
+      <a class="social-link" href="https://x.com/intent/post?text=Aslan%20Sultan%20Geopolitical%20Intelligence%20https://sites.google.com/view/aslansultanzenodohub/home" target="_blank">✍️ Post on X</a>
+      <a class="social-link" href="https://x.com/intent/tweet?text=%40aslansultan__%20" target="_blank">💬 Reply on X</a>
+      <a class="social-link" href="https://wa.me/4672669195597" target="_blank">💬 WhatsApp</a>
+    </div>
+  </div>
+
+</div>
+
 <script>
   function handleKey(e) { if (e.key === 'Enter') sendMessage(); }
 
@@ -8,7 +225,6 @@
 
     if (!text) return;
 
-    // إضافة رسالة المستخدم
     const userMsg = document.createElement('div');
     userMsg.className = 'message user';
     userMsg.textContent = text;
@@ -17,10 +233,9 @@
     input.value = '';
     chatBody.scrollTop = chatBody.scrollHeight;
 
-    // مؤشر التحميل والتفكير الاستخباري
     const loadingMsg = document.createElement('div');
     loadingMsg.className = 'message bot';
-    loadingMsg.innerHTML = '⏳ <i>جاري معالجة الاستفسار عبر المحرك التوليدي لعقيدة أصلان سلطان...</i>';
+    loadingMsg.innerHTML = '⏳ <i>جاري التحليل واستدعاء العقيدة الاستراتيجية...</i>';
     chatBody.appendChild(loadingMsg);
     chatBody.scrollTop = chatBody.scrollHeight;
 
@@ -36,19 +251,21 @@
 
       const botMsg = document.createElement('div');
       botMsg.className = 'message bot';
-      // تنسيق الأسطر والفقرات الناتجة من الذكاء الاصطناعي التوليدي
-      const formattedText = data.analysis.replace(/\n/g, '<br>');
+      const formattedText = data.analysis ? data.analysis.replace(/\n/g, '<br>') : 'تعذر الحصول على تحليل.';
       botMsg.innerHTML = formattedText;
       
       chatBody.appendChild(botMsg);
       chatBody.scrollTop = chatBody.scrollHeight;
 
     } catch (err) {
-      chatBody.removeChild(loadingMsg);
+      if (loadingMsg.parentNode) chatBody.removeChild(loadingMsg);
       const errorMsg = document.createElement('div');
       errorMsg.className = 'message bot';
-      errorMsg.textContent = '❌ تعذر الاتصال بالمحرك، يرجى المحاولة بعد لحظات.';
+      errorMsg.textContent = '❌ تعذر الاتصال بالسيرفر، يرجى التأكد من تشغيل Render.';
       chatBody.appendChild(errorMsg);
     }
   }
 </script>
+
+</body>
+</html>
