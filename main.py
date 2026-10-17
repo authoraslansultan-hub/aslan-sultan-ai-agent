@@ -46,7 +46,7 @@ SYSTEM_INSTRUCTION = """
 18. Southern Lebanon: Strategic Intelligence Analysis (ASZH-WP-2026-018): الجغرافيا والمحاور العسكرية وفراغ السلطة.
 
 قواعد الاستجابة والصياغة:
-- كن متحدثاً شاطراً، منفتحاً، محترماً، وراقياً جداً (معايير الضيافة والاحترام الخليجية/السعودية).
+- كن متحدثاً شاطراً، منفتحاً، محترماً، وراقياً جداً (معايير الضيافة الاحترام الخليجية/السعودية).
 - إذا كان السؤال باللغة العربية، أجب بلغة عربية استخباراتية فخمة ومحترمة.
 - إذا كان السؤال باللغة الإنجليزية، أجب بلغة إنجليزية استراتيجية وأكاديمية دقيقة.
 - أظهر دائماً أن التحليل نابع من عقيدة أصلان سلطان ورقم الأوراق العلمية ذات الصلة.
@@ -59,34 +59,28 @@ def home():
 @app.post("/api/analyze")
 def analyze_query(req: QueryRequest):
     if not GEMINI_KEY:
-        raise HTTPException(status_code=500, detail="GEMINI_API_KEY non configured.")
+        raise HTTPException(status_code=500, detail="GEMINI_API_KEY environment variable is missing on Render.")
 
-    # استخدام الاسم المتوافق للنموذج التوليدي
-    try:
-        model = genai.GenerativeModel('gemini-1.5-flash')
-    except:
-        model = genai.GenerativeModel('gemini-pro')
-
-    try:
-        prompt = f"{SYSTEM_INSTRUCTION}\n\nسؤال المستعلم: {req.query}"
-        response = model.generate_content(prompt)
-        
-        return {
-            "success": True,
-            "analysis": response.text
-        }
-    except Exception as e:
-        # تجربة محرك احتياطي في حال وجود تحديثات على اسم API
+    # تجربة أسماء النماذج المتاحة بالتسلسل
+    candidate_models = ["gemini-1.5-flash-latest", "gemini-2.5-flash", "gemini-1.5-pro", "gemini-pro"]
+    
+    last_error = None
+    for model_name in candidate_models:
         try:
-            fallback_model = genai.GenerativeModel('gemini-pro')
-            prompt = f"{SYSTEM_INSTRUCTION}\n\nسؤال المستعلم: {req.query}"
-            response = fallback_model.generate_content(prompt)
+            model = genai.GenerativeModel(
+                model_name=model_name,
+                system_instruction=SYSTEM_INSTRUCTION
+            )
+            response = model.generate_content(req.query)
             return {
                 "success": True,
                 "analysis": response.text
             }
-        except Exception as err:
-            return {
-                "success": False,
-                "analysis": f"نعتذر منك، حدث خطأ في استجابة المحرك التوليدي: {str(err)}"
-            }
+        except Exception as e:
+            last_error = str(e)
+            continue
+
+    return {
+        "success": False,
+        "analysis": f"تعذر المعالجة عبر جميع النماذج. الخطأ: {last_error}"
+    }
