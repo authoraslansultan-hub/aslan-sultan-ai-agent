@@ -2,9 +2,9 @@ import os
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
-import google.generativeai as genai
+from openai import OpenAI
 
-app = FastAPI(title="Aslan Sultan Intelligence Core Engine")
+app = FastAPI(title="Aslan Sultan Intelligence Core - OpenAI Engine")
 
 app.add_middleware(
     CORSMiddleware,
@@ -14,9 +14,8 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-GEMINI_KEY = os.getenv("GEMINI_API_KEY")
-if GEMINI_KEY:
-    genai.configure(api_key=GEMINI_KEY)
+OPENAI_KEY = os.getenv("OPENAI_API_KEY")
+client = OpenAI(api_key=OPENAI_KEY) if OPENAI_KEY else None
 
 class QueryRequest(BaseModel):
     query: str
@@ -46,7 +45,7 @@ SYSTEM_INSTRUCTION = """
 18. Southern Lebanon: Strategic Intelligence Analysis (ASZH-WP-2026-018): الجغرافيا والمحاور العسكرية وفراغ السلطة.
 
 قواعد الاستجابة والصياغة:
-- كن متحدثاً شاطراً، منفتحاً، محترماً، وراقياً جداً (معايير الضيافة الاحترام الخليجية/السعودية).
+- كن متحدثاً شاطراً، منفتحاً، محترماً، وراقياً جداً (معايير الضيافة والاحترام الخليجية/السعودية).
 - إذا كان السؤال باللغة العربية، أجب بلغة عربية استخباراتية فخمة ومحترمة.
 - إذا كان السؤال باللغة الإنجليزية، أجب بلغة إنجليزية استراتيجية وأكاديمية دقيقة.
 - أظهر دائماً أن التحليل نابع من عقيدة أصلان سلطان ورقم الأوراق العلمية ذات الصلة.
@@ -54,33 +53,30 @@ SYSTEM_INSTRUCTION = """
 
 @app.get("/")
 def home():
-    return {"status": "Live", "agent": "Aslan Sultan Intelligence Core"}
+    return {"status": "Live", "engine": "OpenAI GPT Core", "agent": "Aslan Sultan Intelligence Core"}
 
 @app.post("/api/analyze")
 def analyze_query(req: QueryRequest):
-    if not GEMINI_KEY:
-        raise HTTPException(status_code=500, detail="GEMINI_API_KEY environment variable is missing on Render.")
+    if not client:
+        return {"success": False, "analysis": "خطأ: مفتاح OPENAI_API_KEY غير موجود في إعدادات السيرفر."}
 
-    # تجربة أسماء النماذج المتاحة بالتسلسل
-    candidate_models = ["gemini-1.5-flash-latest", "gemini-2.5-flash", "gemini-1.5-pro", "gemini-pro"]
-    
-    last_error = None
-    for model_name in candidate_models:
-        try:
-            model = genai.GenerativeModel(
-                model_name=model_name,
-                system_instruction=SYSTEM_INSTRUCTION
-            )
-            response = model.generate_content(req.query)
-            return {
-                "success": True,
-                "analysis": response.text
-            }
-        except Exception as e:
-            last_error = str(e)
-            continue
-
-    return {
-        "success": False,
-        "analysis": f"تعذر المعالجة عبر جميع النماذج. الخطأ: {last_error}"
-    }
+    try:
+        response = client.chat.completions.create(
+            model="gpt-4o-mini",
+            messages=[
+                {"role": "system", "content": SYSTEM_INSTRUCTION},
+                {"role": "user", "content": req.query}
+            ],
+            temperature=0.7
+        )
+        
+        reply = response.choices[0].message.content
+        return {
+            "success": True,
+            "analysis": reply
+        }
+    except Exception as e:
+        return {
+            "success": False,
+            "analysis": f"نعتذر منك، حدث خطأ في معالجة المحرك: {str(e)}"
+        }
